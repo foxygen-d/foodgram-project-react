@@ -2,13 +2,13 @@ import base64
 
 import django.contrib.auth.password_validation as validators
 import webcolors
-from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
 from posts.models import (Ingredient, IngredientAmount, Recipe, Subscription,
                           Tag)
 from rest_framework import serializers
 from users.models import User
+
 
 class PasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=150)
