@@ -3,11 +3,13 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Модель пользователя."""
     username = models.CharField(
         unique=True,
+        db_index=True,
         max_length=50,
-        verbose_name='Имя',
-        help_text='Имя',
+        verbose_name='Логин',
+        help_text='Логин пользователя',
     )
     first_name = models.CharField(
         max_length=50,
@@ -21,14 +23,15 @@ class User(AbstractUser):
     )
     email = models.EmailField(
         unique=True,
+        db_index=True,
         max_length=50,
         verbose_name='Электронная почта',
         help_text='Адрес электронной почты',
     )
-    password = models.CharField(
-        max_length=50,
-        verbose_name='Пароль',
-        help_text='Пароль',
+    is_subcribed = models.BooleanField(
+        default=False,
+        verbose_name='Подписка на автора',
+        help_text='Отметьте для подписки на автора',
     )
 
     class Meta:
