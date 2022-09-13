@@ -5,6 +5,8 @@ from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
+from posts.models import (FavouriteRecipe, Ingredient, Recipe, ShoppingList,
+                          Subscription, Tag)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -14,14 +16,11 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from posts.models import (FavouriteRecipe, Ingredient, Recipe, ShoppingList,
-                          Subscription, Tag)
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, PasswordSerializer,
                           RecipePostSerializer, RecipeSerializer,
                           SubscriptionSerializer, TagSerializer,
                           UserSerializer)
-
 
 FILENAME = 'my_shopping_cart.pdf'
 
@@ -215,7 +214,8 @@ class FavouriteRecipeViewSet(viewsets.ModelViewSet):
 
     def create(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, pk=recipe_id)
-        if FavouriteRecipe.objects.filter(user=request.user, recipe=recipe).exists():
+        if FavouriteRecipe.objects.filter(user=request.user,
+                                          recipe=recipe).exists():
             return Response(
                 data={'detail': 'Этот рецепт уже есть в избранном!'},
                 status=status.HTTP_400_BAD_REQUEST,

@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-
 User = get_user_model()
 
 
@@ -98,10 +97,10 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(
-                1, 'Запрещено добавлять рецепты блюд, время приготовления которых менее 1 минуты!'
+                1, 'Время приготовления не может быть меньше 1 минуты!'
             ),
             MaxValueValidator(
-                180, 'Запрещено добавлять рецепты блюд, время приготовления которых более 3 часов!'
+                180, 'Время приготовления не может быть более 3 часов!'
             )
         ],
         default=1,
@@ -140,10 +139,10 @@ class IngredientAmount(models.Model):
     amount = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(
-                1, 'Количество используемых в рецепте ингредиентов не может быть меньше 1!'
+                1, 'Количество ингредиентов не может быть меньше 1!'
             ),
             MaxValueValidator(
-                1000, 'Количество используемых в рецепте ингредиентов не может быть больше 1000!'
+                1000, 'Количество ингредиентов не может быть больше 1000!'
             )
         ],
         default=1,

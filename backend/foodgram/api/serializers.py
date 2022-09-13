@@ -1,19 +1,14 @@
 import base64
-import webcolors
 
 import django.contrib.auth.password_validation as validators
+import webcolors
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.forms import ValidationError
-from rest_framework import serializers
-
 from posts.models import (Ingredient, IngredientAmount, Recipe, Subscription,
                           Tag)
+from rest_framework import serializers
 from users.models import User
-
-
-User = get_user_model()
-
 
 class PasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=150)
@@ -37,7 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'is_subscribed',)
+        fields = ('id', 'email', 'username', 'first_name',
+                  'last_name', 'is_subscribed',)
 
     def create(self, validated_data):
         user = User(**validated_data)
@@ -91,7 +87,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 user=request.user, author=obj
             ).exists()
         )
-    
+
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
@@ -106,6 +102,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class Hex2NameColor(serializers.Field):
     def to_representation(self, value):
         return value
+
     def to_internal_value(self, data):
         try:
             data = webcolors.hex_to_name(data)
@@ -124,7 +121,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    """Сериализатор для ингредиентов."""    
+    """Сериализатор для ингредиентов."""
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -178,7 +175,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        instance.cooking_time = validated_data.get('cooking_time',
+                                                   instance.cooking_time)
 
         if 'ingredients' in validated_data:
             ingredients_data = validated_data.pop('ingredients')
