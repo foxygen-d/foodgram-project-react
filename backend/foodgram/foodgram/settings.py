@@ -28,7 +28,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -64,7 +63,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='admin'),
-        'HOST': os.getenv('POSTGRES_HOST', default='db'),
+        'HOST': os.getenv('POSTGRES_HOST', default='127.0.0.1'),
         'PORT': os.getenv('DB_PORT', default='5432'),
         'DISABLE_SERVER_SIDE_CURSORS': True,
     }
