@@ -188,12 +188,12 @@ class RecipePostSerializer():
         self.validate_ingredients_tags(ingredients, tags, recipe)
         return recipe
 
-    # def update(self, instance, validated_data):
-    #     super().update(instance, validated_data)
-    #     self.validate_ingredients_tags(
-    #         instance.tag,
-    #         instance.ingredients,
-    #         instance.recipe,
-    #     )
-    #     instance.save()
-    #     return instance
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        self.validate_ingredients_tags(
+            instance.tag,
+            instance.ingredients,
+            instance.recipe,
+        )
+        instance.save()
+        return instance
