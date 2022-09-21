@@ -5,8 +5,6 @@ from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from posts.models import (FavouriteRecipe, Ingredient, Recipe, ShoppingList,
-                          Subscription, Tag)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -16,20 +14,20 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from posts.models import Ingredient, Recipe, ShoppingList, Subscription, Tag
+from .mixins import CreateDeleteMixin
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, PasswordSerializer,
                           RecipePostSerializer, RecipeSerializer,
                           SubscriptionSerializer, TagSerializer,
                           UserSerializer)
 
-FILENAME = 'my_shopping_cart.pdf'
+FILENAME = 'my_shopping_list.pdf'
 
 User = get_user_model()
 
 
 class CreateUserViewSet(UserViewSet):
-    """Вьюсет для пользователя."""
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitOffsetPagination
@@ -51,14 +49,10 @@ class CreateUserViewSet(UserViewSet):
         user = request.user
         context = {'request': request}
         serializer = PasswordSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response({'status': 'Пароль установлен!'})
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)            
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response({'status': 'Пароль установлен!'})
 
     @action(
         detail=False,
@@ -121,23 +115,20 @@ class CreateUserViewSet(UserViewSet):
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
-    """Представление для подписок пользователя."""
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = LimitOffsetPagination
 
 
-class TagViewSet(viewsets.ModelViewSet):
-    """Представление для тегов."""
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = LimitOffsetPagination
 
 
-class IngredientViewSet(viewsets.ModelViewSet):
-    """Представление для ингредиентов."""
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [permissions.AllowAny]
@@ -145,7 +136,6 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """Представление для рецептов."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthorOrReadOnly,)
@@ -166,7 +156,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def download_shopping_cart(self, request):
-        """Получение списка покупок в формате pdf."""
         buffer = io.BytesIO()
         page = canvas.Canvas(buffer)
         pdfmetrics.registerFont(TTFont('List', 'data/List.ttf'))
@@ -206,43 +195,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return FileResponse(buffer, as_attachment=True, filename=FILENAME)
 
 
-class FavouriteRecipeViewSet(viewsets.ModelViewSet):
+class FavouriteRecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthorOrReadOnly,)
     pagination_class = LimitOffsetPagination
 
-    def create(self, request, recipe_id):
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        if FavouriteRecipe.objects.filter(user=request.user,
-                                          recipe=recipe).exists():
-            return Response(
-                data={'detail': 'Этот рецепт уже есть в избранном!'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        FavouriteRecipe.objects.create(user=request.user, recipe=recipe)
-        serializer = self.get_serializer(recipe)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self, request, recipe_id):
-        user = request.user
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        favorite = FavouriteRecipe.objects.filter(user=user, recipe=recipe)
-        if not favorite.exists():
-            return Response(
-                data={'detail': 'Вы не подписаны на этот рецепт!'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        favorite.delete()
-        return Response(
-            f'Рецепт {favorite} удален из избранного у пользователя'
-            f' {request.user}',
-            status=status.HTTP_204_NO_CONTENT,
-        )
-
-
-class ShoppingListViewSet(viewsets.ModelViewSet):
-    """Представление для списка покупок."""
+class ShoppingListViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (
@@ -250,32 +210,4 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
         IsAuthorOrReadOnly,
         IsAuthenticated,
     )
-
-    def create(self, request, recipe_id):
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        if ShoppingList.objects.filter(
-            user=request.user, recipe=recipe
-        ).exists():
-            return Response(
-                data={'detail': 'Рецепт уже есть в списке покупок!'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        ShoppingList.objects.create(user=request.user, recipe=recipe)
-        serializer = self.get_serializer(recipe)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def delete(self, request, recipe_id):
-        user = request.user
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        cart = ShoppingList.objects.filter(user=user, recipe=recipe)
-        if not cart.exists():
-            return Response(
-                data={'detail': 'Рецепта еще нет в списке покупок!'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        cart.delete()
-        return Response(
-            f'Рецепт {cart} удален из списка покупок у пользователя'
-            f' {request.user}',
-            status=status.HTTP_204_NO_CONTENT,
-        )
+    pagination_class = LimitOffsetPagination
