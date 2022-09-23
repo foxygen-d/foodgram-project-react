@@ -49,7 +49,7 @@ class CreateUserViewSet(UserViewSet):
         user = request.user
         context = {'request': request}
         serializer = PasswordSerializer(data=request.data, context=context)
-        serializer.is_valid(raise_exception=True)            
+        serializer.is_valid(raise_exception=True)
         user.set_password(serializer.validated_data['new_password'])
         user.save()
         return Response({'status': 'Пароль установлен!'})
@@ -112,6 +112,7 @@ class CreateUserViewSet(UserViewSet):
                 )
             subscribe.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+        return False
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
