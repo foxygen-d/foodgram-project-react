@@ -6,7 +6,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='secret')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['158.160.5.175', 'localhost', '127.0.0.1', 'backend']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -63,7 +63,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='admin'),
-        'HOST': os.getenv('POSTGRES_HOST', default='127.0.0.1'),
+        'HOST': os.getenv('POSTGRES_HOST', default='db'),
         'PORT': os.getenv('DB_PORT', default='5432'),
         'DISABLE_SERVER_SIDE_CURSORS': True,
     }
