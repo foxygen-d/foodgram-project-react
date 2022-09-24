@@ -4,7 +4,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='secret')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['158.160.5.175', 'localhost', '127.0.0.1', 'backend']
 
@@ -68,7 +68,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='admin'),
-        'HOST': os.getenv('POSTGRES_HOST', default='db'),
+        'HOST': os.getenv('POSTGRES_HOST', default='127.0.0.1'),
         'PORT': os.getenv('DB_PORT', default='5432'),
         'DISABLE_SERVER_SIDE_CURSORS': True,
     }
@@ -113,7 +113,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',

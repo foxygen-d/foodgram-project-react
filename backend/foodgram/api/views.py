@@ -30,6 +30,7 @@ User = get_user_model()
 class CreateUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
     pagination_class = LimitOffsetPagination
     http_method_name = (
         'get',

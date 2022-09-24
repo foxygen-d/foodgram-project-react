@@ -9,7 +9,10 @@ services:
       - ./.env
 
   backend:
-    image: foxygend/foodgram_backend:v1.1.1
+    # image: foxygend/foodgram_backend:v1.1.1
+    build:
+      context: ../backend/foodgram
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/static/
