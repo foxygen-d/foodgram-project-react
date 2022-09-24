@@ -12,6 +12,8 @@ services:
     image: foxygend/foodgram_frontend:v1.1.1
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
 
   backend:
     image: foxygend/foodgram_backend:v1.1.1
