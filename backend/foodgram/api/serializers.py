@@ -71,7 +71,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(author=obj.author).count()
 
     def get_is_subscribed(self, obj):
-        return Subscription.objects.filter(user=obj.user, author=obj.author).exists()
+        return Subscription.objects.filter(
+            user=obj.user,
+            author=obj.author
+        ).exists()
 
 
 class TagSerializer(serializers.ModelSerializer):
