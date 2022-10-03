@@ -6,9 +6,14 @@ class User(AbstractUser):
     username = models.CharField(
         unique=True,
         db_index=True,
-        max_length=50,
+        max_length=100,
         verbose_name='Логин',
         help_text='Логин пользователя',
+    )
+    password = models.CharField(
+        max_length=255,
+        verbose_name='Пароль',
+        help_text='Пароль пользователя',
     )
     first_name = models.CharField(
         max_length=50,

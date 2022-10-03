@@ -1,19 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, serializers, status, viewsets
+from rest_framework import mixins, status, viewsets, serializers
 from rest_framework.response import Response
 
 from posts.models import Recipe, Subscription
-
-
-class SubscriptionMixin(serializers.Serializer):
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return (
-            request.user.is_authenticated
-            and Subscription.objects.filter(
-                user=request.user, author=obj
-            ).exists()
-        )
 
 
 class CreateDeleteMixin(mixins.CreateModelMixin, mixins.DestroyModelMixin,

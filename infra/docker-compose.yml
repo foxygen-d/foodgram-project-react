@@ -9,10 +9,7 @@ services:
       - ./.env
 
   backend:
-    # image: foxygend/foodgram_backend:v1.1.1
-    build:
-      context: ../backend/foodgram
-      dockerfile: Dockerfile
+    image: foxygend/foodgram_backend:v1.1.1
     restart: always
     volumes:
       - static_value:/app/static/
@@ -39,10 +36,10 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-      - static_value:/usr/share/nginx/html/backend_static/:ro
-      - media_value:/usr/share/nginx/html/backend_media:ro
+      - static_value:/var/html/django/static/
+      - media_value:/var/html/django/media/
     depends_on:
-      - frontend
+      - backend
 
 volumes:
   postgres_data:

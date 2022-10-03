@@ -68,7 +68,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='admin'),
-        'HOST': os.getenv('POSTGRES_HOST', default='127.0.0.1'),
+        'HOST': os.getenv('POSTGRES_HOST', default='db'),
         'PORT': os.getenv('DB_PORT', default='5432'),
         'DISABLE_SERVER_SIDE_CURSORS': True,
     }
@@ -120,7 +120,24 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 6,
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
+    'SEND_ACTIVATION_EMAIL': False,
+    
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.CreateUserSerializer',
+        'current_user': 'api.serializers.CustomUserSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',),
+        'user_list': ('rest_framework.permissions.AllowAny',),
+        'token_create': ['rest_framework.permissions.AllowAny'],
+    },
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
