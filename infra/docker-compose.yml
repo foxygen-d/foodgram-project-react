@@ -12,8 +12,8 @@ services:
     image: foxygend/foodgram_backend:v1.1.1
     restart: always
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
+      - static_value:/app/django/static/
+      - media_value:/app/django/media/
     depends_on:
       - db
     links:
