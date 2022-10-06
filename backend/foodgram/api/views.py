@@ -4,13 +4,13 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import filters, permissions, status, viewsets, serializers
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from posts.models import (FavoriteRecipe, Ingredient, IngredientAmount,
-                          Recipe, ShoppingCart, Subscription, Tag)
+from posts.models import (FavoriteRecipe, Ingredient, IngredientAmount, Recipe,
+                          ShoppingCart, Subscription, Tag)
 from users.models import User
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import LimitPageNumberPagination
