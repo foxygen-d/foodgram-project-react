@@ -4,7 +4,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='secret')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['158.160.5.175', 'localhost', '127.0.0.1', 'backend']
 
@@ -103,11 +103,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/django/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'django/static')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = '/django/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'django/media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'users.User'
 

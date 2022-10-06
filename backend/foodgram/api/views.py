@@ -4,17 +4,17 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, permissions, status, viewsets, serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from posts.models import (FavouriteRecipe, Ingredient, IngredientAmount,
-                          Recipe, ShoppingList, Subscription, Tag)
+from posts.models import (FavoriteRecipe, Ingredient, IngredientAmount,
+                          Recipe, ShoppingCart, Subscription, Tag)
 from users.models import User
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import LimitPageNumberPagination
-from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipePostSerializer, RecipeSerializer,
                           SubscribeRecipeSerializer, SubscriptionSerializer,
@@ -62,7 +62,8 @@ class UsersViewSet(UserViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -88,20 +89,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipeSerializer
-        else:
-            return RecipePostSerializer
+        return RecipePostSerializer
 
-    @staticmethod
-    def __add_recipe(model, request, pk):
+    def post_del_recipe(self, model, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        model.objects.create(recipe=recipe, user=request.user)
-        serializer = SubscribeRecipeSerializer(recipe)
-        return Response(data=serializer.data, status=HTTPStatus.CREATED)
+        if request.method == 'POST':
+            model.objects.create(recipe=recipe, user=self.request.user)
+            serializer = SubscribeRecipeSerializer(recipe)
+            return Response(data=serializer.data, status=HTTPStatus.CREATED)
 
-    @staticmethod
-    def __delete_recipe(model, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
-        model.objects.filter(recipe=recipe, user=request.user).delete()
+        model.objects.filter(recipe=recipe, user=self.request.user).delete()
         return Response(status=HTTPStatus.NO_CONTENT)
 
     @action(
@@ -110,19 +107,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, pk=None):
-        if request.method == 'POST':
-            return self.__add_recipe(FavouriteRecipe, request, pk)
-        return self.__delete_recipe(FavouriteRecipe, request, pk)
-
-    @action(
-        detail=True,
-        methods=['POST', 'DELETE'],
-        permission_classes=(IsAuthenticated,)
-    )
-    def recipe(self, request, pk):
-        if request.method == 'POST':
-            return self.__add_recipe(Recipe, request, pk)
-        return self.__delete_recipe(Recipe, request, pk)
+        return self.post_del_recipe(FavoriteRecipe, request, pk)
 
     @action(
         detail=True,
@@ -130,9 +115,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def shopping_cart(self, request, pk):
-        if request.method == 'POST':
-            return self.__add_recipe(ShoppingList, request, pk)
-        return self.__delete_recipe(ShoppingList, request, pk)
+        return self.post_del_recipe(ShoppingCart, request, pk)
 
     @action(
         detail=False,
@@ -141,7 +124,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         user = request.user
-        purchases = ShoppingList.objects.filter(user=user)
+        purchases = ShoppingCart.objects.filter(user=user)
         file = 'shopping-list.txt'
         with open(file, 'w') as f:
             shop_cart = dict()

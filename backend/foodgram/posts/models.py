@@ -71,7 +71,7 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         default=None,
-        upload_to='',
+        upload_to='media',
         verbose_name='Картинка',
         help_text='Фото блюда',
     )
@@ -123,12 +123,14 @@ class IngredientAmount(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
+        related_name='amount_ingredient',
         verbose_name='Ингредиент',
         help_text='Ингредиент',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        related_name='amount_ingredient',
         verbose_name='Рецепт',
         help_text='Рецепт',
     )
@@ -193,18 +195,18 @@ class Subscription(models.Model):
         return f'{self.user} {self.author}'
 
 
-class FavouriteRecipe(models.Model):
+class FavoriteRecipe(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favourite_recipe',
+        related_name='in_favorites',
         verbose_name='Пользователь',
         help_text='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favourite_recipe',
+        related_name='favorites',
         verbose_name='Избранный рецепт',
         help_text='Избранный рецепт',
     )
@@ -214,7 +216,7 @@ class FavouriteRecipe(models.Model):
         verbose_name_plural = 'Списки избранного'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'], name='unique_recipe_in_favorite'
+                fields=['user', 'recipe'], name='unique_favorites'
             )
         ]
 
@@ -222,18 +224,18 @@ class FavouriteRecipe(models.Model):
         return f'{self.user} {self.recipe}'
 
 
-class ShoppingList(models.Model):
+class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_list',
+        related_name='in_shopping_cart',
         verbose_name='Пользователь',
         help_text='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_list',
+        related_name='shopping_cart',
         verbose_name='Рецепт в списке покупок',
         help_text='Рецепт в списке покупок',
     )
