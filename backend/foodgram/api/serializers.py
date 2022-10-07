@@ -102,7 +102,7 @@ class IngredientRecipeGetSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer()
-    image = Base64ImageField(required=False, allow_null=True)
+    image = Base64ImageField()
     ingredients = IngredientRecipeGetSerializer(many=True,
                                                 read_only=True,
                                                 source='amount_ingredient')
@@ -141,7 +141,7 @@ class RecipePostSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
     ingredients = IngredientAmountSerializer(many=True)
-    image = Base64ImageField(max_length=None, use_url=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe

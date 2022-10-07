@@ -13,3 +13,5 @@ PyJWT==2.1.0
 pytz==2020.1
 sqlparse==0.3.1
 reportlab==3.6.9
+drf-base64==2.0
+drf-extra-fields==3.4.0

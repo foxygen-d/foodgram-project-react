@@ -12,7 +12,7 @@ services:
     image: foxygend/foodgram_backend:v1.1.1
     restart: always
     volumes:
-      - static_value:/app/static/
+      - static_value:/app/static_backend/
       - media_value:/app/media/
     depends_on:
       - db
@@ -30,13 +30,14 @@ services:
 
   nginx:
     image: nginx:1.19.3
+    restart: always
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-      - static_value:/var/html/static/
+      - static_value:/var/html/static_backend/
       - media_value:/var/html/media/
     depends_on:
       - backend
