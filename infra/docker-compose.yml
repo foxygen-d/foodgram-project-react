@@ -13,7 +13,7 @@ services:
     restart: always
     volumes:
       - static_value:/app/static_backend/
-      - media_value:/app/media/
+      - media_value:/media/
     depends_on:
       - db
     links:

@@ -6,6 +6,7 @@ django-filter==2.4.0
 djangorestframework==3.12.4
 djangorestframework-simplejwt==4.8.0
 djoser==2.1.0
+drf-extra-fields==3.4.0
 webcolors==1.11.1
 gunicorn==20.0.4
 psycopg2-binary==2.8.6
@@ -13,5 +14,3 @@ PyJWT==2.1.0
 pytz==2020.1
 sqlparse==0.3.1
 reportlab==3.6.9
-drf-base64==2.0
-drf-extra-fields==3.4.0
