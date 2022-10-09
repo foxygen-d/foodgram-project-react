@@ -91,15 +91,35 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipePostSerializer
 
-    def post_del_recipe(self, model, request, pk):
+    def post_del_recipe(self, request, pk, database):
         recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'POST':
-            model.objects.create(recipe=recipe, user=self.request.user)
-            serializer = SubscribeRecipeSerializer(recipe)
-            return Response(data=serializer.data, status=HTTPStatus.CREATED)
+        if request.method == 'POST':            
+            if not database.objects.filter(
+                    user=self.request.user,
+                    recipe=recipe).exists():
+                database.objects.create(
+                    user=self.request.user,
+                    recipe=recipe)
+                serializer = SubscribeRecipeSerializer(recipe)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+            text = 'errors: Объект уже в списке.'
+            return Response(text, status=status.HTTP_400_BAD_REQUEST)
 
-        model.objects.filter(recipe=recipe, user=self.request.user).delete()
-        return Response(status=HTTPStatus.NO_CONTENT)
+        if request.method == 'DELETE':
+            if database.objects.filter(
+                    user=self.request.user,
+                    recipe=recipe).exists():
+                database.objects.filter(
+                    user=self.request.user,
+                    recipe=recipe).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            text = 'errors: Объект не в списке.'
+            return Response(text, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            text = 'errors: Метод обращения недопустим.'
+            return Response(text, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
@@ -107,7 +127,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, pk=None):
-        return self.post_del_recipe(FavoriteRecipe, request, pk)
+        return self.post_del_recipe(request, pk, FavoriteRecipe)
 
     @action(
         detail=True,
@@ -115,7 +135,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def shopping_cart(self, request, pk):
-        return self.post_del_recipe(ShoppingCart, request, pk)
+        return self.post_del_recipe(request, pk, ShoppingCart)
 
     @action(
         detail=False,
