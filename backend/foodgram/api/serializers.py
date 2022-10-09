@@ -1,8 +1,8 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
-from posts.models import (Ingredient, IngredientAmount, Recipe, Subscription,
-                          Tag, FavoriteRecipe, ShoppingCart)
+from posts.models import (FavoriteRecipe, Ingredient, IngredientAmount, Recipe,
+                          ShoppingCart, Subscription, Tag)
 from users.models import User
 from .fields import Base64ImageField, Hex2NameColor
 

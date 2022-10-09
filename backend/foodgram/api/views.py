@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -93,7 +91,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def post_del_recipe(self, request, pk, database):
         recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'POST':            
+        if request.method == 'POST':
             if not database.objects.filter(
                     user=self.request.user,
                     recipe=recipe).exists():
